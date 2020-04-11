@@ -136,12 +136,7 @@ func (d *LiteIndex) Terms(field string, term string) []iq.Query {
 	return queries
 }
 
-func (d *LiteIndex) NewTermQuery(field string, term string) iq.Query {
-	if len(field) == 0 || len(term) == 0 {
-		return iq.Term(d.TotalNumberOfDocs, fmt.Sprintf("broken(%s:%s)", field, term), []int32{})
-	}
-
-	t := field + "/" + term
+func (d *LiteIndex) Postings(t string) []int32 {
 	list := []byte{}
 
 	err := d.db.QueryRow("select list from "+d.table+" where id=?", t).Scan(&list)
@@ -151,10 +146,20 @@ func (d *LiteIndex) NewTermQuery(field string, term string) iq.Query {
 			from := i * 4
 			postings[i] = int32(binary.LittleEndian.Uint32(list[from : from+4]))
 		}
-		return iq.Term(d.TotalNumberOfDocs, t, postings)
+		return postings
 	} else {
-		return iq.Term(d.TotalNumberOfDocs, fmt.Sprintf("missing(%s:%s)", field, term), []int32{})
+		return []int32{}
 	}
+}
+
+func (d *LiteIndex) NewTermQuery(field string, term string) iq.Query {
+	if len(field) == 0 || len(term) == 0 {
+		return iq.Term(d.TotalNumberOfDocs, fmt.Sprintf("broken(%s:%s)", field, term), []int32{})
+	}
+
+	t := field + "/" + term
+	p := d.Postings(t)
+	return iq.Term(d.TotalNumberOfDocs, t, p)
 }
 
 func (d *LiteIndex) Close() {
