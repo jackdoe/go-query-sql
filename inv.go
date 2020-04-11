@@ -99,7 +99,7 @@ type ConcatQuery string
 
 const (
 	SQLITE3 ConcatQuery = "SET list = list || $1 WHERE id=$2"
-	MYSQL   ConcatQuery = "SET list = concat(list,$1) WHERE id=$2"
+	MYSQL   ConcatQuery = "SET list = concat(list,$1) WHERE id=$2" // untested
 )
 
 func (d *LiteIndex) add(tx *sql.Tx, t string, docs []int32) error {
