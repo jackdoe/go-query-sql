@@ -64,8 +64,12 @@ func TestExampleLite(t *testing.T) {
 		&ExampleCity{Name: "London", Country: "UK", ID: 2},
 		&ExampleCity{Name: "Sofia Amsterdam", Country: "BG", ID: 3},
 	}
+	err = m.Index(toDocumentsID(list)...)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	for i := len(list); i < 100; i++ {
+	for i := len(list); i < 1000; i++ {
 		//		list = append(list, &ExampleCity{Name: fmt.Sprintf("%dLondon", i), Country: "UK", ID: int32(i)})
 
 		x := &ExampleCity{Name: "London", Country: "UK", ID: int32(i)}
@@ -76,10 +80,6 @@ func TestExampleLite(t *testing.T) {
 		}
 
 		list = append(list, x)
-	}
-	err = m.Index(toDocumentsID(list)...)
-	if err != nil {
-		t.Fatal(err)
 	}
 	n := 0
 	q := iq.And(m.Terms("name", "aMSterdam sofia")...)
@@ -121,12 +121,10 @@ func TestExampleLite(t *testing.T) {
 	qqq = iq.Or(m.Terms("name", "london")...)
 
 	m.Foreach(qqq, func(did int32, score float32) {
-		city := list[did]
-		log.Printf("lazy %v matching with score %f", city, score)
 		n++
 	})
-	if n != 3 {
-		t.Fatalf("expected 3 got %d", n)
+	if n != 997 {
+		t.Fatalf("expected 997 got %d", n)
 	}
 
 }
