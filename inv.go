@@ -7,9 +7,8 @@ import (
 	"strings"
 
 	iq "github.com/rekki/go-query"
-	"github.com/rekki/go-query/util/analyzer"
-	spec "github.com/rekki/go-query/util/go_query_dsl"
-	"github.com/rekki/go-query/util/index"
+	analyzer "github.com/rekki/go-query-analyze"
+	index "github.com/rekki/go-query-index"
 )
 
 type LiteIndex struct {
@@ -83,16 +82,6 @@ func (d *LiteIndex) Index(docs ...index.DocumentWithID) error {
 	}
 
 	return tx.Commit()
-}
-
-func (d *LiteIndex) Parse(input *spec.Query) (iq.Query, error) {
-	return index.Parse(input, func(k, v string) iq.Query {
-		terms := d.Terms(k, v)
-		if len(terms) == 1 {
-			return terms[0]
-		}
-		return iq.Or(terms...)
-	})
 }
 
 type ConcatQuery string

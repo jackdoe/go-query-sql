@@ -10,7 +10,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	iq "github.com/rekki/go-query"
-	"github.com/rekki/go-query/util/index"
+	index "github.com/rekki/go-query-index"
 )
 
 // get full list from https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json
